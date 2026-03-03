@@ -1,13 +1,26 @@
-.DS_Store
-.env
-*.log
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
 
+# Virtual envs
+.venv/
+venv/
 backend/.venv/
-backend/data/
-backend/app/__pycache__/
-backend/app/*.pyc
 
-frontend/.DS_Store
+# Env files and secrets
+.env
+backend/.env
 
+# Logs / local db
+*.log
+backend/data/*.db
+backend/data/*.sqlite
+backend/data/*.sqlite3
+
+# macOS
+.DS_Store
+
+# IDE
 .vscode/
 .idea/

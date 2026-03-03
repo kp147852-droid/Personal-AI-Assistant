@@ -108,9 +108,8 @@ class AIClient:
             return parsed
         return self._fallback_explain("Unable to parse image explanation.", reading_level)
 
-    def chat(self, message: str, memory_snippets: list[str], profile: dict[str, Any] | None = None) -> str:
+    def chat(self, message: str, memory_snippets: list[str]) -> str:
         memory_context = "\n".join(f"- {item}" for item in memory_snippets[-8:])
-        profile_context = json.dumps(profile or {}, ensure_ascii=True)
         system = (
             f"You are {self.assistant_name}, a practical life assistant for someone with ADHD. "
             "Be supportive but direct. Keep answers short, clear, and actionable. "
@@ -119,25 +118,24 @@ class AIClient:
 
         if not self._client:
             return (
-                "I got you. Here is a simple next step: write one 10-minute task you can do now, "
-                "start a timer, and ignore everything else until it rings."
+                "AI mode is currently offline. Add OPENAI_API_KEY in backend/.env, restart the server, "
+                "then I can answer your actual question."
             )
 
-        response = self._client.responses.create(
-            model=self.model,
-            input=[
-                {"role": "system", "content": system},
-                {
-                    "role": "user",
-                    "content": (
-                        f"Learning profile:\n{profile_context}\n\n"
-                        f"Memory:\n{memory_context}\n\n"
-                        f"User message:\n{message}"
-                    ),
-                },
-            ],
-        )
-        return response.output_text
+        try:
+            response = self._client.responses.create(
+                model=self.model,
+                input=[
+                    {"role": "system", "content": system},
+                    {
+                        "role": "user",
+                        "content": f"Memory:\n{memory_context}\n\nUser message:\n{message}",
+                    },
+                ],
+            )
+            return response.output_text
+        except Exception as exc:
+            return f"AI request failed: {exc}"
 
     def coach(self, stress_level: int, focus_level: int, notes: str | None) -> dict[str, str]:
         if not self._client:
@@ -168,39 +166,3 @@ class AIClient:
             "coaching": "Take one small step now. Momentum beats perfection.",
             "next_action": "Choose one task and do 5 minutes right now.",
         }
-
-    def build_learning_profile(
-        self,
-        interactions: list[dict[str, Any]],
-        current_profile: dict[str, Any],
-    ) -> dict[str, Any]:
-        if not self._client:
-            return {}
-
-        trimmed = interactions[-80:]
-        prompt = (
-            "You create a user learning profile for an ADHD-friendly assistant. "
-            "Use observed behavior only. Return JSON with keys: "
-            "persona_summary (string), top_focus_areas (array), friction_points (array), "
-            "preferred_response_style (array), active_goals (array), suggested_routines (array), "
-            "confidence_notes (array)."
-        )
-
-        response = self._client.responses.create(
-            model=self.model,
-            input=[
-                {"role": "system", "content": prompt},
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        {
-                            "current_profile": current_profile,
-                            "recent_interactions": trimmed,
-                        },
-                        ensure_ascii=True,
-                    ),
-                },
-            ],
-            text={"format": {"type": "json_object"}},
-        )
-        return self._as_json(response.output_text)

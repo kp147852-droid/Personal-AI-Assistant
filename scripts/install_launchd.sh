@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/Users/kyleparker/Documents/New project 2/data/Personal AI assistant"
+ROOT_DIR="/Users/kyleparker/Documents/New project 2/data/AI assistant"
 PLIST_SRC="$ROOT_DIR/deploy/com.focusmate.backend.plist"
 PLIST_DST="$HOME/Library/LaunchAgents/com.focusmate.backend.plist"
 

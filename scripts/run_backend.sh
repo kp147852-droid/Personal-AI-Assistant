@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/Users/kyleparker/Documents/New project 2/data/Personal AI assistant"
+ROOT_DIR="/Users/kyleparker/Documents/New project 2/data/AI assistant"
 BACKEND_DIR="$ROOT_DIR/backend"
 
 cd "$BACKEND_DIR"
@@ -13,4 +13,5 @@ fi
 source .venv/bin/activate
 pip install -r requirements.txt >/dev/null
 
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+PORT="${BIND_PORT:-8000}"
+exec uvicorn app.main:app --host 127.0.0.1 --port "$PORT"

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from pydantic import BaseModel, Field
 
 
@@ -49,14 +47,3 @@ class CheckinCreate(BaseModel):
 class CoachingResponse(BaseModel):
     coaching: str
     next_action: str
-
-
-class LearningRefreshRequest(BaseModel):
-    use_ai: bool = False
-
-
-class LearningProfileResponse(BaseModel):
-    profile: dict[str, Any]
-    source: str
-    events_analyzed: int
-    updated_at: str | None = None

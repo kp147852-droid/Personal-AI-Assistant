@@ -1,106 +1,66 @@
-# Personal AI Assistant (MacBook + iPhone)
+# Alpha (Local Personal AI Assistant)
 
-Your own AI assistant software that:
-- Explains documents, screenshots, and tasks in simpler language.
-- Learns continuously from your interactions and builds a personalized profile.
-- Helps with ADHD-friendly planning, reminders, and stress/focus coaching.
-- Runs on your MacBook and is available on iPhone.
+Alpha is designed as a **strict single-user local app**. Each person who installs it runs their own instance and local database.
 
-## Core architecture
+## Privacy/Isolation Model
 
-- Backend: `FastAPI` + `SQLite`
-- AI: OpenAI Responses API (optional but recommended)
-- Frontend: installable web app (PWA)
-- Continuous mode: macOS `launchd`
+- Alpha stores memory/tasks/check-ins in local SQLite on that machine.
+- Backend binds to `127.0.0.1` by default (not publicly reachable).
+- Requests from non-local client IPs are rejected by middleware.
+- Trusted host and CORS defaults are limited to localhost origins.
+- Relay/peer communication code is removed from this project.
+- `SINGLE_USER_MODE=true` is enforced at backend startup.
 
-## Continuous learning model
-
-The app updates a `learning_profile` from your real usage:
-- `chat`, `explain_text`, `explain_image`
-- `task_create`, `task_update`
-- `memory_add`, `checkin`
-
-Profile fields include:
-- persona summary
-- focus areas
-- friction points
-- preferred response style
-- active goals
-- suggested routines
-
-Endpoints:
-- `GET /api/learning/profile`
-- `POST /api/learning/refresh` with `{ "use_ai": true }` for AI-enhanced profile synthesis
-
-## 1) Local setup
+## 1) Backend setup (Mac)
 
 ```bash
-cd "/Users/kyleparker/Documents/New project 2/data/Personal AI assistant/backend"
-python3 -m venv .venv
+cd "/Users/kyleparker/Documents/New project 2/data/AI assistant/backend"
+python3.13 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Set `.env`:
+Set API key in `.env`:
 
 ```bash
 OPENAI_API_KEY=your_key_here
 OPENAI_MODEL=gpt-4.1-mini
-ASSISTANT_NAME=FocusMate
+ASSISTANT_NAME=Alpha
 ```
 
-Run backend + app UI:
+Run:
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Open on MacBook:
+Open:
 - `http://localhost:8000/app`
 
-## 2) iPhone access
-
-On same Wi-Fi, find Mac IP:
+## 2) Run continuously on Mac (optional)
 
 ```bash
-ipconfig getifaddr en0
-```
-
-Open on iPhone Safari:
-- `http://<your-mac-ip>:8000/app`
-
-Install on iPhone Home Screen:
-1. Safari Share button
-2. `Add to Home Screen`
-
-## 3) Run continuously on MacBook
-
-```bash
-cd "/Users/kyleparker/Documents/New project 2/data/Personal AI assistant"
+cd "/Users/kyleparker/Documents/New project 2/data/AI assistant"
 ./scripts/install_launchd.sh
 ```
 
-Check service:
+Useful commands:
 
 ```bash
 launchctl list | grep focusmate
+launchctl unload ~/Library/LaunchAgents/com.focusmate.backend.plist
+launchctl load ~/Library/LaunchAgents/com.focusmate.backend.plist
 ```
 
-## 4) Publish to GitHub
+Logs:
+- `/Users/kyleparker/Documents/New project 2/data/AI assistant/backend/data/launchd.out.log`
+- `/Users/kyleparker/Documents/New project 2/data/AI assistant/backend/data/launchd.err.log`
 
-Create an empty GitHub repo named `personal-ai-assistant`, then run:
+## 3) iPhone usage (strict isolation)
 
-```bash
-cd "/Users/kyleparker/Documents/New project 2/data/Personal AI assistant"
-git add .
-git commit -m "Initial commit: Personal AI Assistant with continuous learning"
-git remote add origin git@github.com:<your-username>/personal-ai-assistant.git
-git push -u origin main
-```
+Run a separate Alpha installation per device/user:
+- Mac Alpha: local DB on Mac.
+- iPhone Alpha: its own local app/runtime and storage.
 
-## 5) Privacy notes
-
-- Your local data is stored in `backend/data/assistant.db`.
-- `.env` and database files are git-ignored.
-- If you open-source the project, do not publish personal database files or secrets.
+This repository intentionally does not include user-to-user or Alpha-to-Alpha connection features.

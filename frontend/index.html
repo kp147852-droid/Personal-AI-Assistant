@@ -3,56 +3,44 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0f172a" />
-    <link rel="manifest" href="/app/manifest.webmanifest" />
-    <link rel="stylesheet" href="/app/styles.css" />
-    <title>FocusMate Assistant</title>
+    <base href="/app/" />
+    <meta name="theme-color" content="#b31217" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Alpha Assistant</title>
   </head>
   <body>
-    <main class="app">
-      <header>
-        <h1>FocusMate</h1>
-        <p>Your explain-anything + life assistant</p>
+    <main class="shell">
+      <header class="topbar">
+        <img src="logo-alpha.svg" alt="Alpha logo" class="logo" />
+        <div class="title-wrap">
+          <h1>Alpha</h1>
+          <p class="subtitle">Your red-line assistant for school, life, and focus</p>
+        </div>
+        <p id="statusLine" class="status">Checking AI status...</p>
       </header>
 
-      <section class="card">
-        <h2>Learning Profile</h2>
-        <p class="muted">Updates automatically as you use chat, check-ins, memory, and tasks.</p>
-        <button id="refreshLearningBtn">Refresh (AI-enhanced)</button>
-        <pre id="learningOut"></pre>
+      <section id="chatFeed" class="chat-feed" aria-live="polite">
+        <article class="bubble alpha">
+          Say "Alpha" or type your question. You can also add a photo from camera with the + button.
+        </article>
       </section>
 
-      <section class="card">
-        <h2>Explain Text</h2>
-        <textarea id="explainInput" rows="6" placeholder="Paste schoolwork, task instructions, or anything confusing..."></textarea>
-        <button id="explainBtn">Explain Simply</button>
-        <pre id="explainOut"></pre>
-      </section>
+      <footer class="composer-wrap">
+        <div id="plusMenu" class="plus-menu hidden">
+          <label for="imageInput" class="menu-item">Attach Camera/Image</label>
+          <button id="speakToggle" class="menu-item" type="button">Voice Replies: On</button>
+        </div>
 
-      <section class="card">
-        <h2>Explain Image</h2>
-        <input id="imageInput" type="file" accept="image/*" capture="environment" />
-        <button id="imageBtn">Analyze Image</button>
-        <pre id="imageOut"></pre>
-      </section>
-
-      <section class="card">
-        <h2>Assistant Chat</h2>
-        <textarea id="chatInput" rows="3" placeholder="What do you need help with right now?"></textarea>
-        <button id="chatBtn">Get Help</button>
-        <pre id="chatOut"></pre>
-      </section>
-
-      <section class="card">
-        <h2>Quick Check-in</h2>
-        <label>Stress (1-10): <input id="stress" type="number" min="1" max="10" value="5" /></label>
-        <label>Focus (1-10): <input id="focus" type="number" min="1" max="10" value="5" /></label>
-        <textarea id="checkinNotes" rows="2" placeholder="What is getting in the way?"></textarea>
-        <button id="checkinBtn">Get Coaching</button>
-        <pre id="checkinOut"></pre>
-      </section>
+        <div class="composer">
+          <button id="plusBtn" class="icon-btn" type="button" aria-label="More options">+</button>
+          <textarea id="chatInput" rows="1" placeholder="Message Alpha..." autocomplete="off"></textarea>
+          <button id="actionBtn" class="action-btn" type="button" aria-label="Send or speak">Mic</button>
+          <input id="imageInput" type="file" accept="image/*" capture="environment" hidden />
+        </div>
+      </footer>
     </main>
 
-    <script src="/app/app.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

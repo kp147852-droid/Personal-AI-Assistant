@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Alpha robot logo">
+  <defs>
+    <linearGradient id="head" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff3b30"/>
+      <stop offset="100%" stop-color="#b31217"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="44" width="160" height="160" rx="38" fill="url(#head)"/>
+  <rect x="104" y="20" width="48" height="28" rx="14" fill="#e21b23"/>
+  <circle cx="128" cy="34" r="8" fill="#111111"/>
+  <rect x="74" y="48" width="108" height="8" rx="4" fill="#9e0b12" opacity="0.6"/>
+  <circle cx="98" cy="112" r="18" fill="#111111"/>
+  <circle cx="158" cy="112" r="18" fill="#111111"/>
+  <rect x="86" y="148" width="84" height="16" rx="8" fill="#111111"/>
+  <rect x="72" y="212" width="36" height="16" rx="8" fill="#212121"/>
+  <rect x="148" y="212" width="36" height="16" rx="8" fill="#212121"/>
+</svg>

@@ -8,11 +8,11 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/kyleparker/Documents/New project 2/data/Personal AI assistant/scripts/run_backend.sh</string>
+    <string>/Users/kyleparker/Documents/New project 2/data/AI assistant/scripts/run_backend.sh</string>
   </array>
 
   <key>WorkingDirectory</key>
-  <string>/Users/kyleparker/Documents/New project 2/data/Personal AI assistant/backend</string>
+  <string>/Users/kyleparker/Documents/New project 2/data/AI assistant/backend</string>
 
   <key>RunAtLoad</key>
   <true/>
@@ -21,9 +21,9 @@
   <true/>
 
   <key>StandardOutPath</key>
-  <string>/Users/kyleparker/Documents/New project 2/data/Personal AI assistant/backend/data/launchd.out.log</string>
+  <string>/Users/kyleparker/Documents/New project 2/data/AI assistant/backend/data/launchd.out.log</string>
 
   <key>StandardErrorPath</key>
-  <string>/Users/kyleparker/Documents/New project 2/data/Personal AI assistant/backend/data/launchd.err.log</string>
+  <string>/Users/kyleparker/Documents/New project 2/data/AI assistant/backend/data/launchd.err.log</string>
 </dict>
 </plist>
