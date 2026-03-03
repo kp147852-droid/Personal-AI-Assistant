@@ -1,22 +1,49 @@
-# Alpha (Local Personal AI Assistant)
+# Alpha: Local-First AI Personal Assistant
 
-Alpha is a strict single-user local assistant for Mac/iPhone-style usage.  
-Each installation has its own local data. No Alpha-to-Alpha communication is implemented.
+Alpha is a local-first AI assistant designed for explanation, coaching, and daily task support.
+It combines chat, voice input/output, and image understanding in a single app experience.
 
-## Privacy and Isolation
+## Why This Project Matters
 
-- Local SQLite storage per installation.
-- Backend binds to `127.0.0.1` only.
-- Non-local client requests are blocked.
-- CORS and trusted hosts are localhost-only.
-- Relay/peer code is removed.
-- `SINGLE_USER_MODE=true` is enforced at startup.
+- Demonstrates practical AI product design for real users (education + ADHD support).
+- Implements security-first local architecture (single-user isolation by default).
+- Shows full-stack delivery across backend APIs, frontend UX, and deployment scripts.
 
-## Requirements
+## Role-Relevant Skills Demonstrated
 
-- macOS
-- Python `3.13`
-- Optional: OpenAI API key for full AI responses
+| Role | Evidence in this repo |
+| --- | --- |
+| Business Analyst | User-problem framing, feature prioritization, clear workflows, operational docs |
+| Data Scientist | Structured data capture (`memory`, `tasks`, `checkins`) for future analytics |
+| AI Engineer | Prompt design, multimodal flows (text + image), robust API fallback/error handling |
+| Product/Platform Engineer | FastAPI backend, local persistence, launchd runtime, PWA-style frontend |
+
+## Core Features
+
+- Chat assistant with contextual memory.
+- "Explain this simply" text workflow.
+- Image explanation from upload/camera.
+- Voice input + optional voice replies.
+- ADHD-friendly check-in coaching.
+- Local SQLite persistence.
+- Strict single-user mode and local-only access controls.
+
+## Security and Privacy Model
+
+- Runs on `127.0.0.1` only.
+- Rejects non-local client requests.
+- CORS/trusted hosts restricted to localhost.
+- No user-to-user or Alpha-to-Alpha communication layer in this build.
+- `SINGLE_USER_MODE=true` enforced at startup.
+
+See detailed security notes in [docs/SECURITY.md](docs/SECURITY.md).
+
+## Tech Stack
+
+- Backend: FastAPI, Pydantic, SQLite
+- AI: OpenAI Responses API
+- Frontend: HTML/CSS/Vanilla JS (mobile-friendly, chat-style UI)
+- Runtime: macOS launchd script for always-on mode
 
 ## Quick Start (Mac)
 
@@ -28,7 +55,7 @@ pip install -r requirements.txt
 cp -n .env.example .env
 ```
 
-Edit `backend/.env`:
+Update `backend/.env`:
 
 ```env
 OPENAI_API_KEY=your_key_here
@@ -37,7 +64,7 @@ ASSISTANT_NAME=Alpha
 SINGLE_USER_MODE=true
 ```
 
-Run backend:
+Run:
 
 ```bash
 cd backend
@@ -45,21 +72,23 @@ source .venv/bin/activate
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Open in Safari:
+Open in browser:
+
 - `http://localhost:8000/app/`
 
-## Verify Health
+## Health Check
 
 ```bash
 curl -s http://127.0.0.1:8000/health
 ```
 
-Expected:
+Expected fields:
+
 - `"status": "ok"`
 - `"single_user_mode": true`
-- `"ai_enabled": true` when `OPENAI_API_KEY` is valid
+- `"ai_enabled": true` (when API key is valid)
 
-## Run Continuously on Mac (Optional)
+## Run Continuously (Optional)
 
 ```bash
 ./scripts/install_launchd.sh
@@ -73,35 +102,34 @@ launchctl unload ~/Library/LaunchAgents/com.focusmate.backend.plist
 launchctl load ~/Library/LaunchAgents/com.focusmate.backend.plist
 ```
 
-Logs:
-- `backend/data/launchd.out.log`
-- `backend/data/launchd.err.log`
+## CI
+
+This repo includes a lightweight GitHub Actions workflow to run Python compile checks on push/PR.
 
 ## Troubleshooting
 
 - `{"detail":"Not Found"}`:
-  - Use `http://localhost:8000/app/` (include trailing slash).
-  - Restart backend.
-
-- UI loads as plain white text:
-  - Hard refresh in Safari: `Cmd + Option + R`.
-
-- `FetchEvent.respondWith ... Returned response is null`:
-  - Clear stale service worker in Safari console:
-    ```js
-    navigator.serviceWorker.getRegistrations().then(r => Promise.all(r.map(x => x.unregister()))).then(() => location.reload())
-    ```
-
-- Repeating fallback message / AI offline:
-  - Confirm `backend/.env` has `OPENAI_API_KEY=...`.
-  - Restart backend after editing `.env`.
-  - Check health endpoint and confirm `"ai_enabled": true`.
-
+  - Open `http://localhost:8000/app/` (include trailing slash).
+- White screen/plain text:
+  - Hard refresh in Safari with `Cmd + Option + R`.
+- Service worker fetch errors:
+  - Clear service workers from browser dev console and reload.
 - `429 insufficient_quota`:
-  - API billing/quota issue on OpenAI account.
-  - Check billing and limits in OpenAI platform settings.
+  - OpenAI billing/limits issue for the API key.
 
-## Notes for iPhone
+## Repository Docs
 
-This repo is local-first and single-user.  
-If an iPhone build is created, it should run as a separate local installation with its own storage.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/EMPLOYER-OVERVIEW.md](docs/EMPLOYER-OVERVIEW.md)
+- [docs/ROADMAP.md](docs/ROADMAP.md)
+- [docs/SECURITY.md](docs/SECURITY.md)
+
+## Portfolio Positioning Tips
+
+- Pin this repository on your GitHub profile.
+- Add a short demo video/GIF in the README.
+- Use consistent keywords in your profile: `AI assistant`, `FastAPI`, `LLM`, `data workflows`, `product analytics`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

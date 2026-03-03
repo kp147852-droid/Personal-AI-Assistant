@@ -26,6 +26,21 @@ class AIClient:
         except json.JSONDecodeError:
             return {}
 
+    @staticmethod
+    def _friendly_error(exc: Exception) -> str:
+        msg = str(exc)
+        lowered = msg.lower()
+        if "insufficient_quota" in lowered or "exceeded your current quota" in lowered:
+            return (
+                "OpenAI quota exceeded for this API key. Update billing/limits in OpenAI platform "
+                "or switch to another valid key."
+            )
+        if "invalid_api_key" in lowered or "incorrect api key" in lowered:
+            return "OPENAI_API_KEY is invalid. Update backend/.env and restart the server."
+        if "rate limit" in lowered:
+            return "Rate limit reached. Wait a moment and retry."
+        return f"AI request failed: {msg}"
+
     def _fallback_explain(self, content: str, reading_level: str) -> dict[str, Any]:
         short = " ".join(content.strip().split())
         if len(short) > 800:
@@ -55,16 +70,19 @@ class AIClient:
             f"Target reading level: {reading_level}."
         )
 
-        response = self._client.responses.create(
-            model=self.model,
-            input=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": content},
-            ],
-            text={"format": {"type": "json_object"}},
-        )
-        parsed = self._as_json(response.output_text)
-        return parsed if parsed else self._fallback_explain(content, reading_level)
+        try:
+            response = self._client.responses.create(
+                model=self.model,
+                input=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": content},
+                ],
+                text={"format": {"type": "json_object"}},
+            )
+            parsed = self._as_json(response.output_text)
+            return parsed if parsed else self._fallback_explain(content, reading_level)
+        except Exception as exc:
+            return self._fallback_explain(self._friendly_error(exc), reading_level)
 
     def explain_image(self, image_b64: str, mime_type: str, reading_level: str) -> dict[str, Any]:
         if not self._client:
@@ -87,26 +105,29 @@ class AIClient:
             "Return JSON with keys: summary, key_points (3-6), steps_to_understand (3-6). "
             f"Target reading level: {reading_level}."
         )
-        response = self._client.responses.create(
-            model=self.model,
-            input=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "input_text", "text": prompt},
-                        {
-                            "type": "input_image",
-                            "image_url": f"data:{mime_type};base64,{image_b64}",
-                        },
-                    ],
-                }
-            ],
-            text={"format": {"type": "json_object"}},
-        )
-        parsed = self._as_json(response.output_text)
-        if parsed:
-            return parsed
-        return self._fallback_explain("Unable to parse image explanation.", reading_level)
+        try:
+            response = self._client.responses.create(
+                model=self.model,
+                input=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "input_text", "text": prompt},
+                            {
+                                "type": "input_image",
+                                "image_url": f"data:{mime_type};base64,{image_b64}",
+                            },
+                        ],
+                    }
+                ],
+                text={"format": {"type": "json_object"}},
+            )
+            parsed = self._as_json(response.output_text)
+            if parsed:
+                return parsed
+            return self._fallback_explain("Unable to parse image explanation.", reading_level)
+        except Exception as exc:
+            return self._fallback_explain(self._friendly_error(exc), reading_level)
 
     def chat(self, message: str, memory_snippets: list[str]) -> str:
         memory_context = "\n".join(f"- {item}" for item in memory_snippets[-8:])
@@ -135,7 +156,7 @@ class AIClient:
             )
             return response.output_text
         except Exception as exc:
-            return f"AI request failed: {exc}"
+            return self._friendly_error(exc)
 
     def coach(self, stress_level: int, focus_level: int, notes: str | None) -> dict[str, str]:
         if not self._client:
@@ -151,17 +172,23 @@ class AIClient:
         )
         user = f"Stress: {stress_level}/10, Focus: {focus_level}/10, Notes: {notes or 'None'}"
 
-        response = self._client.responses.create(
-            model=self.model,
-            input=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": user},
-            ],
-            text={"format": {"type": "json_object"}},
-        )
-        parsed = self._as_json(response.output_text)
-        if "coaching" in parsed and "next_action" in parsed:
-            return {"coaching": str(parsed["coaching"]), "next_action": str(parsed["next_action"])}
+        try:
+            response = self._client.responses.create(
+                model=self.model,
+                input=[
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": user},
+                ],
+                text={"format": {"type": "json_object"}},
+            )
+            parsed = self._as_json(response.output_text)
+            if "coaching" in parsed and "next_action" in parsed:
+                return {"coaching": str(parsed["coaching"]), "next_action": str(parsed["next_action"])}
+        except Exception as exc:
+            return {
+                "coaching": self._friendly_error(exc),
+                "next_action": "Retry when API access is available.",
+            }
         return {
             "coaching": "Take one small step now. Momentum beats perfection.",
             "next_action": "Choose one task and do 5 minutes right now.",
