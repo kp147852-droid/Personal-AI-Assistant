@@ -1,0 +1,13 @@
+.DS_Store
+.env
+*.log
+
+backend/.venv/
+backend/data/
+backend/app/__pycache__/
+backend/app/*.pyc
+
+frontend/.DS_Store
+
+.vscode/
+.idea/
